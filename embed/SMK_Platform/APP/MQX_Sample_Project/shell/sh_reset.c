@@ -5,6 +5,8 @@
 #include <mqx.h>
 #include <shell.h>
 
+#include "mqx_utils.h"
+
 //=============================================================================
 static void usage(void)
 {
@@ -28,9 +30,7 @@ int32_t Shell_reset(int32_t argc, char *argv[])
 		return (0);
 	}
 
-	SCB_AIRCR = SCB_AIRCR_VECTKEY(0x5FA) | SCB_AIRCR_SYSRESETREQ_MASK;
-
-	_time_delay(1000);
+	MQX_SWReset();
 
 	return (0);
 }

@@ -26,6 +26,11 @@ enum {
 
 	ELL_ADP_CTRL_REQ_QUEUE,
 
+	ELL_GATEWAY_APP_MESSAGE_QUEUE,
+	ELL_GATEWAY_SVR_MESSAGE_QUEUE,
+
+	MQTT_WATCH_ACK_MESSAGE_QUEUE,
+
 	APP_LAST_QUEUE
 };
 
@@ -40,6 +45,10 @@ enum {
 #define DEFAULT_FTP_DOMAIN    {0}
 #define DEFAULT_FTP_SUBDOMAIN {'s','l','b','-','f','t','p'}
 #define DEFAULT_FTP_PATH      {'a','p','p'}
+
+#define DEFAULT_SGWS_HOST	{ 's', 'l', 'b', '-', 'f', 't', 'p', '.', 's', 'm', 'k', '.', 'c', 'o', '.', 'j', 'p', 0 }
+#define DEFAULT_SGWS_PORTNO	{ 0, 0 }
+#define DEFAULT_SGWS_PATH	{ '/', 'w', 'e', 'b', 's', 'o', 'c', 'k', 'e', 't', 0 }
 
 //=============================================================================
 // Hardware Resouces
@@ -58,8 +67,10 @@ enum {
 //=============================================================================
 
 // Adapter Type
-#define APP_ENL_ADAPTER
-// #define APP_MID_ADAPTER
+// #define APP_ENL_ADAPTER
+#define APP_MID_ADAPTER
+// #define APP_HAx2_AS_SWITCH_CLASS
+// #define APP_ENL_CONTROLLER
 
 #define APP_MAIN_NAME "SwBox Type Ethernet Adapter"
 
@@ -67,11 +78,16 @@ enum {
 #define APP_SUB_NAME "ECHONET Lite Adapter (HA)"
 #elif defined(APP_MID_ADAPTER)
 #define APP_SUB_NAME "ECHONET Lite Middleware Adapter"
+#elif defined(APP_HAx2_AS_SWITCH_CLASS)
+#define APP_SUB_NAME "ECHONET Lite Adapter (HAx2)"
+#elif defined(APP_ENL_CONTROLLER)
+#define APP_SUB_NAME "ECHONET Lite Controller"
 #else
-#error need to define APP_ENL_ADAPTER or APP_MID_ADAPTER
+#error need to define APP_*
 #endif
 
-// Firmware
+#if defined(APP_ENL_ADAPTER)
+// Firmware for OKAYA
 // #define APP_OKAYA_HAx1_AIRCON
 // #define APP_OKAYA_HAx1_WATER_HEATER
 // #define APP_OKAYA_HAx1_FLOOR_HEATER
@@ -86,10 +102,19 @@ enum {
 #elif defined(APP_OKAYA_HAx1_ELECTRIC_LOCK)
   #define APP_FW_NAME "OKAYA HA Electric Lock"
 #endif
+#elif defined(APP_MID_ADAPTER)
+#define APP_FW_NAME "ECHONET Lite Middleware Adapter"
+#elif defined(APP_HAx2_AS_SWITCH_CLASS)
+#define APP_FW_NAME "HA Switch x2"
+#elif defined(APP_ENL_CONTROLLER)
+#define APP_FW_NAME "Controller"
+#endif
 
 //=============================================================================
 // Version Number and Build Date (BCD Coded)
 //=============================================================================
+#if defined(APP_ENL_ADAPTER)
+
 #if defined(APP_OKAYA_HAx1_AIRCON)
   #define VERSION_MAJOR	0x01	/* Major version */		
 #elif defined(APP_OKAYA_HAx1_WATER_HEATER)
@@ -105,6 +130,39 @@ enum {
 #define VERSION_MONTH	0x04	/* Month */
 #define VERSION_DATE	0x20	/* Date */
 
+#elif defined(APP_MID_ADAPTER)
+
+#define VERSION_MAJOR	0x05	/* Major version */		
+#define VERSION_MINOR	0x00	/* Minor version */
+#define VERSION_YEAR	0x2015	/* Year */
+#define VERSION_MONTH	0x08	/* Month */
+#define VERSION_DATE	0x27	/* Date */
+
+#elif defined(APP_HAx2_AS_SWITCH_CLASS)
+
+#define VERSION_MAJOR	0x00	/* Major version */		
+#define VERSION_MINOR	0x00	/* Minor version */
+#define VERSION_YEAR	0x2015	/* Year */
+#define VERSION_MONTH	0x01	/* Month */
+#define VERSION_DATE	0x01	/* Date */
+
+#elif defined(APP_ENL_CONTROLLER)
+
+#define VERSION_MAJOR	0x00	/* Major version */		
+#define VERSION_MINOR	0x00	/* Minor version */
+#define VERSION_YEAR	0x2015	/* Year */
+#define VERSION_MONTH	0x01	/* Month */
+#define VERSION_DATE	0x01	/* Date */
+
+#else
+
+#define VERSION_MAJOR	0x00	/* Major version */		
+#define VERSION_MINOR	0x00	/* Minor version */
+#define VERSION_YEAR	0x2015	/* Year */
+#define VERSION_MONTH	0x01	/* Month */
+#define VERSION_DATE	0x01	/* Date */
+
+#endif
 
 //=============================================================================
 // Build Switches

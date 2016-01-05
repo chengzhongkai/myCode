@@ -190,9 +190,12 @@ bool_t MWA_AnnoProperty(uint32_t eoj,
 
 void MWA_CheckAnnounce(void);
 
+void MWA_RestartENL(void);
+
 
 // ----------------------------------------------------------------------------
-bool_t MWA_InitAdapter(UDP_Handle_t *udp, MWA_UARTHandle_t *uart);
+bool_t MWA_InitAdapter(const uint8_t *node_profile_def, int def_len,
+					   UDP_Handle_t *udp, MWA_UARTHandle_t *uart);
 bool_t MWA_HandleAdapter(MWA_Event_t *event);
 MWA_Event_t *MWA_GetAdapterEvent(void);
 

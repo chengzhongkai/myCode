@@ -169,6 +169,7 @@
         <option>
           <name>CCDefines</name>
           <state>DEBUG_LEVEL=1</state>
+          <state>__FREESCALE_MQX__</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -306,6 +307,7 @@
           <state>$PROJ_DIR$/../MQX/lib/SMK_Gateway.iar/debug/mfs</state>
           <state>$PROJ_DIR$/../MQX/lib/SMK_Gateway.iar/debug/rtcs</state>
           <state>$PROJ_DIR$/../MQX/lib/SMK_Gateway.iar/debug/shell</state>
+          <state>$PROJ_DIR$/src/cau</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1912,10 +1914,34 @@
   <group>
     <name>Platform</name>
     <file>
+      <name>$PROJ_DIR$\src\aes.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\aes.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\base64.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\base64.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\bignum.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\bignum.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\src\debug_log.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\src\debug_log.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\des.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\des.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\src\DHCP_monitoring.c</name>
@@ -1945,6 +1971,18 @@
       <name>$PROJ_DIR$\src\FTPClient.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\src\hash.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\hash.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\hmac.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\hmac.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\src\mqx_utils.c</name>
     </file>
     <file>
@@ -1966,6 +2004,18 @@
       <name>$PROJ_DIR$\src\platform.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\src\rand.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\rand.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\sha1.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\sha1.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\src\spi_memory.c</name>
     </file>
     <file>
@@ -1976,6 +2026,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\src\storage_api.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\uuid.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\uuid.h</name>
     </file>
   </group>
 </project>

@@ -851,4 +851,24 @@ void MWA_CheckAnnounce(void)
     MWA_UnlockENL();
 }
 
+//=============================================================================
+void MWA_RestartENL(void)
+{
+    int size;
+    const uint8_t first_epc[] = { 0xd5, 0x00 };
+
+	if (gpUDP == NULL) return;
+
+    MWA_LockENL();
+
+	UDP_Reset(gpUDP);
+
+    size = ELL_MakeINFPacket(0, 0x0ef001, 0x0ef001,
+                             first_epc, gSendBuffer, sizeof(gSendBuffer));
+
+    MWA_SendPacket(gpUDP, NULL, gSendBuffer, size);
+
+    MWA_UnlockENL();
+}
+
 /******************************** END-OF-FILE ********************************/

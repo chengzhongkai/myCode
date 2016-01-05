@@ -6,6 +6,13 @@
 
 #include "ell_adapter.h"
 
+// Customize for Sankyo-Tateyama
+#define FOR_SANKYO_TATEYAMA
+
+#ifdef FOR_SANKYO_TATEYAMA
+#include "ipcfg.h"
+#endif
+
 //=============================================================================
 #ifdef __FREESCALE_MQX__
 extern void LED_SetMode(uint8_t led, uint8_t mode);
@@ -137,24 +144,8 @@ static int gInitPropertyPtr;
 static MWA_InitProperty_t *gInitPropertyList = NULL;
 
 //=============================================================================
-static const uint8_t gNodeProfileEPCDefine[] = {
-  0x80,  1, 0x30, EPC_FLAG_RULE_GET,
-  0x82,  4, 0x01, 0x0a, 0x01, 0x00, EPC_FLAG_RULE_GET,
-  0x83, 17, 0xfe, 0x00, 0x00, 0x7e,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, EPC_FLAG_RULE_GET,
-  0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
-
-#if 0
-  0xd3,  3, 0x00, 0x00, 0x01, EPC_FLAG_RULE_GET, // N of Instances
-  0xd4,  2, 0x00, 0x01, EPC_FLAG_RULE_GET, // N of Classes
-  0xd5,  4, 0x01, 0x01, 0x30, 0x01, EPC_FLAG_RULE_ANNO, // Instance List [ANNO]
-  0xd6,  4, 0x01, 0x01, 0x30, 0x01, EPC_FLAG_RULE_GET, // Node Instance List
-  0xd7,  3, 0x01, 0x00, 0x30, EPC_FLAG_RULE_GET, // Node Class List
-#endif
-
-  0x00 /*** Terminator ***/
-};
+static const uint8_t *gMWANodeProfile = NULL;
+static int gMWANodeProfileLen = 0;
 
 //=============================================================================
 // Work for Request from Ready Device
@@ -420,13 +411,13 @@ static uint8_t *MWA_CreateNodeProfileEPCDefine(void)
     class_list[0] = num_classes;
     class_list_size = num_classes * 2 + 1;
 
-    define = MEM_Alloc(sizeof(gNodeProfileEPCDefine) + (3 * 5)
+    define = MEM_Alloc(gMWANodeProfileLen + (3 * 5)
                        + 3 + 2 // 0xD3, 0xD4
                        + instance_list_size * 2 // 0xD5, 0xD6
                        + class_list_size); // 0xD7
     if (define != NULL) {
-        MEM_Copy(define, gNodeProfileEPCDefine, sizeof(gNodeProfileEPCDefine));
-        ptr = define + (sizeof(gNodeProfileEPCDefine) - 1);
+        MEM_Copy(define, gMWANodeProfile, gMWANodeProfileLen);
+        ptr = define + (gMWANodeProfileLen - 1);
 
         *ptr ++ = 0xd3;
         *ptr ++ = 3;
@@ -504,9 +495,16 @@ static void MWA_ResetAdapter(void)
 //=============================================================================
 // Initialize Adapter
 //=============================================================================
-bool_t MWA_InitAdapter(UDP_Handle_t *udp, MWA_UARTHandle_t *uart)
+bool_t MWA_InitAdapter(const uint8_t *node_profile_def, int def_len,
+					   UDP_Handle_t *udp, MWA_UARTHandle_t *uart)
 {
     int cnt;
+
+	if (node_profile_def == NULL || def_len <= 0) return (FALSE);
+	if (node_profile_def[def_len - 1] != 0) return (FALSE);
+
+	gMWANodeProfile = node_profile_def;
+	gMWANodeProfileLen = def_len;
 
     gNumAdapterObjectInfo = 0;
     for (cnt = 0; cnt < MWA_NUM_OBJECT_INFO; cnt ++) {
@@ -1826,6 +1824,23 @@ static void MWA_EnterState_StartEchonet(void)
             case 0x8e: // Product Date
                 ELL_InitProperty(obj, prop->epc, 4, info->product_date);
                 break;
+
+#ifdef FOR_SANKYO_TATEYAMA
+			case 0x83:
+			{
+				uint8_t id_number[17];
+				const uint8_t cmp_zero[6] = {0};
+				_enet_address mac;
+				ELL_GetProperty(obj, 0x83, id_number, 17);
+				if (MEM_Compare(&id_number[11], cmp_zero, 6) == 0) {
+					// if last 6 bytes are all 0x00, fill MAC address there.
+					ipcfg_get_mac(BSP_DEFAULT_ENET_DEVICE, mac);
+					MEM_Copy(&id_number[11], (uint8_t *)mac, 6);
+					ELL_InitProperty(obj, 0x83, 17, id_number);
+				}
+			}
+				break;
+#endif
             }
         }
     }
@@ -2086,6 +2101,17 @@ static bool_t MWA_HandleRecvFrame_NormalOperationC1(MWA_Frame_t *frame)
 
         if (result == 0x0000 && len > 0 && len <= 256) {
             pdc = (uint8_t)(len - 1);
+#ifdef FOR_SANKYO_TATEYAMA
+			if (epc == 0x83 && pdc == 17) {
+				const uint8_t cmp_zero[6] = {0};
+				_enet_address mac;
+				if (MEM_Compare(&edt[11], cmp_zero, 6) == 0) {
+					// if last 6 bytes are all 0x00, fill MAC address there.
+					ipcfg_get_mac(BSP_DEFAULT_ENET_DEVICE, mac);
+					MEM_Copy((uint8_t *)&edt[11], (uint8_t *)mac, 6);
+				}
+			}
+#endif
             MWA_ResponseENLAccess(ELL_EOJ(eoj), epc, pdc, edt);
         } else {
             MWA_ResponseENLAccess(ELL_EOJ(eoj), 0, 0, NULL);

@@ -2,18 +2,14 @@
 /* Copyright (c) 2015 SMK Corporation. All rights reserved.                  */
 /*****************************************************************************/
 
-#include "flash_utils.h"
 #include "eeprom_api.h"
 
 #include "Config.h"
 
+#include "flash_utils.h"
+
 //=============================================================================
-#ifndef EXEO_PLATFORM
-#define EEPROM_MAP_TABLE_SIZE 10
-#else
-#define EEPROM_MAP_TABLE_SIZE 13
-#endif
-static const EEPROM_Table_t gEEPROMMapTable[EEPROM_MAP_TABLE_SIZE] =
+static const EEPROM_Table_t gEEPROMMapTable[FLASHROM_MAX_ID] =
 {
 	{ FLASHROM_MACADDR_ADDR,	FLASHROM_MACADDR_SIZE },
 	{ FLASHROM_MACHINE_ADDR,	FLASHROM_MACHINE_SIZE },
@@ -25,6 +21,11 @@ static const EEPROM_Table_t gEEPROMMapTable[EEPROM_MAP_TABLE_SIZE] =
 	{ FLASHROM_STATICIP_ADDR,	FLASHROM_STATICIP_SIZE },
 	{ FLASHROM_SUBNET_ADDR,		FLASHROM_SUBNET_SIZE },
 	{ FLASHROM_GATEWAY_ADDR,	FLASHROM_GATEWAY_SIZE },
+
+	{ FLASHROM_SGWS_HOST_ADDR,	FLASHROM_SGWS_HOST_SIZE },
+	{ FLASHROM_SGWS_PORTNO_ADDR,FLASHROM_SGWS_PORTNO_SIZE },
+	{ FLASHROM_SGWS_PATH_ADDR,	FLASHROM_SGWS_PATH_SIZE },
+
 #ifdef EXEO_PLATFORM
 	{ FLASHROM_CONFIG_ADDR,		FLASHROM_CONFIG_SIZE },
 	{ FLASHROM_CALIBRATION_ADDR,FLASHROM_CALIBRATION_SIZE },
@@ -55,6 +56,10 @@ const INIT_DATA default_data[] = {
 	{ FLASHROM_SUBNET_ID,	FLASHROM_SUBNET_SIZE,	DEFAULT_SEBNET_MASK   },
 	{ FLASHROM_GATEWAY_ID,	FLASHROM_GATEWAY_SIZE,	DEFAULT_GATEWAY       },
 
+	{ FLASHROM_SGWS_HOST_ID, FLASHROM_SGWS_HOST_SIZE, DEFAULT_SGWS_HOST },
+	{ FLASHROM_SGWS_PORTNO_ID, FLASHROM_SGWS_PORTNO_SIZE, DEFAULT_SGWS_PORTNO },
+	{ FLASHROM_SGWS_PATH_ID, FLASHROM_SGWS_PATH_SIZE, DEFAULT_SGWS_PATH },
+
 	{ 0,					0,						DATA_CLEAR            },
 };
 
@@ -77,7 +82,7 @@ bool Flash_Init(void)
 	uint8_t mac_addr[6];
 	const uint8_t no_mac_addr[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-	if (EEPROM_Init(gEEPROMMapTable, EEPROM_MAP_TABLE_SIZE) != MQX_OK) {
+	if (EEPROM_Init(gEEPROMMapTable, FLASHROM_MAX_ID) != MQX_OK) {
 		return (FALSE);
 	}
 

@@ -42,4 +42,12 @@ uint32_t MQX_CreateTask(_task_id *task_id,
 	return (err);
 }
 
+//=============================================================================
+void MQX_SWReset(void)
+{
+	SCB_AIRCR = SCB_AIRCR_VECTKEY(0x5FA) | SCB_AIRCR_SYSRESETREQ_MASK;
+
+	_time_delay(1000);
+}
+
 /******************************** END-OF-FILE ********************************/

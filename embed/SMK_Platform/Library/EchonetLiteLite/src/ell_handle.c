@@ -14,6 +14,7 @@ static uint8_t gEDTWork[ELL_EDT_WORK_SIZE];
 /*** Need To Initailize in RESET Function ***/
 static ELL_SendPacketCB *gSendPacket = NULL;
 static ELL_RecvPropertyCB *gRecvProperty = NULL;
+static ELL_NotifyAnnoEPCCB *gNotifyAnnoEPC = NULL;
 
 #define sendPacket(handle, to, buf, len) do {       \
         if (gSendPacket != NULL) {                  \
@@ -74,6 +75,14 @@ bool_t ELL_SetLockFunc(ELL_LockCB *lock, ELL_UnlockCB *unlock, void *data)
     gLockData = data;
 
     return (TRUE);
+}
+
+//=============================================================================
+// Set Notify Announce EPC Callback
+//=============================================================================
+void ELL_SetNotifyAnnoEPCCallback(ELL_NotifyAnnoEPCCB *callback)
+{
+	gNotifyAnnoEPC = callback;
 }
 
 //=============================================================================
@@ -153,10 +162,10 @@ static void ELL_HandleRequestPacket(ELL_Iterator_t *it, ELL_Header_t *header,
             } else if ((flag & EPC_FLAG_RULE_GETUP) != 0
                        && cur_obj->get_cb != NULL) {
                 // ------------------------------- Has Callback for Getting ---
-                pdc = (*(ELL_GetCallback *)cur_obj->get_cb)(cur_obj,
-                                                            prop.epc,
-                                                            gEDTWork,
-                                                            ELL_EDT_WORK_SIZE);
+                pdc = (*(ELL_GetCallback_t *)cur_obj->get_cb)(cur_obj,
+															  prop.epc,
+															  gEDTWork,
+															  ELL_EDT_WORK_SIZE);
             } else {
                 // ---------------------------------- Get Property Directly ---
                 pdc = ELL_GetProperty(cur_obj, prop.epc,
@@ -178,10 +187,10 @@ static void ELL_HandleRequestPacket(ELL_Iterator_t *it, ELL_Header_t *header,
             } else if ((flag & EPC_FLAG_RULE_GETUP) != 0
                        && cur_obj->get_cb != NULL) {
                 // ------------------------------- Has Callback for Getting ---
-                pdc = (*(ELL_GetCallback *)cur_obj->get_cb)(cur_obj,
-                                                            prop.epc,
-                                                            gEDTWork,
-                                                            ELL_EDT_WORK_SIZE);
+                pdc = (*(ELL_GetCallback_t *)cur_obj->get_cb)(cur_obj,
+															  prop.epc,
+															  gEDTWork,
+															  ELL_EDT_WORK_SIZE);
             } else {
                 // ---------------------------------- Get Property Directly ---
                 pdc = ELL_GetProperty(cur_obj, prop.epc,
@@ -213,9 +222,9 @@ static void ELL_HandleRequestPacket(ELL_Iterator_t *it, ELL_Header_t *header,
             else if ((flag & EPC_FLAG_RULE_SETUP) != 0
                      && cur_obj->set_cb != NULL) {
                 // ------------------------------- Has Callback for Setting ---
-                if ((*(ELL_SetCallback *)cur_obj->set_cb)(cur_obj,
-                                                          prop.epc, prop.pdc,
-                                                          prop.edt)) {
+                if ((*(ELL_SetCallback_t *)cur_obj->set_cb)(cur_obj,
+															prop.epc, prop.pdc,
+															prop.edt)) {
                     pdc = 0;
                     set_ok = TRUE;
                 }
@@ -419,6 +428,10 @@ void ELL_CheckAnnounce(void *handle)
                                               sizeof(gSendBuffer));
 
                 multicastPacket(handle, gSendBuffer, send_size);
+
+				if (gNotifyAnnoEPC != NULL) {
+					(*gNotifyAnnoEPC)(eoj, anno_list, num_anno);
+				}
             }
         }
     }

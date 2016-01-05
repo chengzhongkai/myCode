@@ -30,8 +30,21 @@ static const SHELL_COMMAND_STRUCT shell_commands[] = {
 #endif
 
 	{ "version",    Shell_version    },
-	{ "info",       Shell_info       },
 	{ "reset",      Shell_reset      },
+
+#if APP_DEBUG
+	{ "dns",        Shell_dns        },
+	{ "info",       Shell_info       },
+	{ "test",       Shell_test       },
+
+	{ "cloud",      Shell_cloud      },
+
+#if 0
+	{ "echo",       Shell_echonet    },
+#endif
+
+	{ "mqtt",       Shell_mqtt       },
+#endif
 
 #if 0 // do not exit
 	{ "exit", Shell_exit },
@@ -65,7 +78,7 @@ uint32_t Console_StartTask(uint32_t priority)
 	_mem_zero((uint8_t *)&template, sizeof(template));
 
 	template.TASK_ADDRESS = Console_Task;
-	template.TASK_STACKSIZE = 2000;
+	template.TASK_STACKSIZE = 1024 * 16;
 	template.TASK_PRIORITY = priority;
 	template.TASK_NAME = "console";
 	template.CREATION_PARAMETER = 0;

@@ -4,6 +4,8 @@
 
 #include "Config.h"
 
+#ifdef APP_MID_ADAPTER
+
 #include "echonetlitelite.h"
 #include "connection.h"
 #include "ell_adapter.h"
@@ -22,6 +24,21 @@
 #define UART_DEVIVCE_NAME "ittyb:"
 
 //=============================================================================
+static uint8_t gMWA_NodeProfileEPCDefine[] = {
+  0x80,  1, 0x30, EPC_FLAG_RULE_GET,
+  0x82,  4, 0x01, 0x0a, 0x01, 0x00, EPC_FLAG_RULE_GET,
+  0x83, 17, 0xfe, 0x00, 0x00, 0x7e,
+            0x0e, 0xf0, 0x01, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, EPC_FLAG_RULE_GET,
+  0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
+
+  // 0xd3-0xd7 are not define here
+
+  0x00 /*** Terminator ***/
+};
+#define MWA_NODE_PROF_MAC_IDX (24)
+
+//=============================================================================
 extern MWA_TimerHandle_t gMWA_SMTimer;
 extern MWA_TimerHandle_t gMWA_ENLTimer;
 
@@ -32,6 +49,7 @@ static uint8_t gRecvUARTBuffer[RECV_UART_BUFFER_SIZE];
 //=============================================================================
 UDP_Handle_t gUDP;
 MWA_UARTHandle_t gUART;
+static bool gMWA_UDPTaskStart = FALSE;
 
 //=============================================================================
 // Middleware Adapter Task
@@ -40,6 +58,7 @@ void MWA_ADP_Task(uint32_t param)
 {
     _mqx_uint sts;
     MWA_Event_t *event;
+	_enet_address mac;
 
     // --------------------------------------- Initialzie OS Dependent Part ---
     sts = _timer_create_component(TIMER_DEFAULT_TASK_PRIORITY,
@@ -62,8 +81,13 @@ void MWA_ADP_Task(uint32_t param)
     // -------------------------------------------------- Setup UART Device ---
     MWA_SetupUART(&gUART, UART_DEVIVCE_NAME);
 
+	// --------------------------------------- Set MAC Address to 0x83 Prop ---
+	ipcfg_get_mac(BSP_DEFAULT_ENET_DEVICE, mac);
+	MEM_Copy(&gMWA_NodeProfileEPCDefine[MWA_NODE_PROF_MAC_IDX], mac, 6);
+
     // -------------------------------------- Initialize Middleware Adapter ---
-    if (!MWA_InitAdapter(&gUDP, &gUART)) {
+    if (!MWA_InitAdapter(gMWA_NodeProfileEPCDefine,
+						 sizeof(gMWA_NodeProfileEPCDefine), &gUDP, &gUART)) {
         /*** Failed to Initialiezd ***/
         err_printf("Failed to Initialize Middleware Adapter...\n");
         _task_block();
@@ -85,10 +109,20 @@ void MWA_ADP_Task(uint32_t param)
 }
 
 //=============================================================================
+void ELL_NotifyReset(void)
+{
+	if (gMWA_UDPTaskStart) {
+		MWA_RestartENL();
+	}
+}
+
+//=============================================================================
 void MWA_UDP_Task(uint32_t param)
 {
     IPv4Addr_t recv_addr;
     int recv_size;
+
+	gMWA_UDPTaskStart = TRUE;
 
     while (1) {
         recv_size = UDP_Recv(&gUDP, gRecvUDPBuffer, RECV_UDP_BUFFER_SIZE,
@@ -163,5 +197,7 @@ void MWA_INF_Task(uint32_t param)
         _time_delay(1000);
     }
 }
+
+#endif /* APP_MID_ADAPTER */
 
 /******************************** END-OF-FILE ********************************/

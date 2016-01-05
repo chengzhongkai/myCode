@@ -18,6 +18,9 @@ void ELL_INF_Task(uint32_t param);
 void ELL_AdpCtrl_Task(uint32_t param);
 void ELL_AdpSync_Task(uint32_t param);
 
+void ELL_GatewayApp_Task(uint32_t param);
+void ELL_GatewaySvr_Task(uint32_t param);
+
 void MWA_ADP_Task(uint32_t param);
 void MWA_UDP_Task(uint32_t param);
 void MWA_UART_Task(uint32_t param);
@@ -41,7 +44,7 @@ const TASK_TEMPLATE_STRUCT MQX_template_list[] =
 	{ TN_FTP_CLIENT_TASK,   FTPClient_task,    8000,  12, "FW Downloader",
 	  0, 0, 0 },
 
-#if defined(APP_ENL_ADAPTER)
+#if defined(APP_ENL_ADAPTER) || defined(APP_HAx2_AS_SWITCH_CLASS) || defined(APP_ENL_CONTROLLER)
 	{ TN_ELL_TASK,          ELL_Task,          2000,   8, "Echonet",
 	  0, 0, 0 },
 	{ TN_ELL_PKT_TASK,      ELL_Handler_Task,  2000,  10, "Echonet Handler",
@@ -52,6 +55,13 @@ const TASK_TEMPLATE_STRUCT MQX_template_list[] =
 	  0, 0, 0 },
 	{ TN_ELL_ADP_SYNC_TASK, ELL_AdpSync_Task,  1000,  10, "Echonet ADP Sync",
 	  0, 0, 0 },
+#endif
+
+#if defined(APP_ENL_CONTROLLER)
+	{ TN_ELL_GATEWAY_APP_TASK,  ELL_GatewayApp_Task,  2000,  10, "Echonet GW App",
+      0, 0, 0 },
+	{ TN_ELL_GATEWAY_SVR_TASK,  ELL_GatewaySvr_Task,  2000,  10, "Echonet GW Server",
+      0, 0, 0 },
 #endif
 
 #if defined(APP_MID_ADAPTER)

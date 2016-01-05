@@ -309,8 +309,12 @@
           <state>$PROJ_DIR$/../../MQX/lib/SMK_Gateway.iar/debug/rtcs</state>
           <state>$PROJ_DIR$/../../MQX/lib/SMK_Gateway.iar/debug/shell</state>
           <state>$PROJ_DIR$/../../Platform/src</state>
+          <state>$PROJ_DIR$/../../Platform/src/cau</state>
           <state>$PROJ_DIR$/../../Library/EchonetLiteLite/include</state>
           <state>$PROJ_DIR$/../../Library/HaControl</state>
+          <state>$PROJ_DIR$/../../Library/WebSocket</state>
+          <state>$PROJ_DIR$/../../Library/TLS</state>
+          <state>$PROJ_DIR$/../../Library/MQTT</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -790,6 +794,9 @@
           <state>$PROJ_DIR$/../../Platform/Debug/Exe/Platform.a</state>
           <state>$PROJ_DIR$/../../Library/EchonetLiteLite/Debug/Exe/EchonetLiteLite.a</state>
           <state>$PROJ_DIR$/../../Library/HaControl/Debug/Exe/HaControl.a</state>
+          <state>$PROJ_DIR$/../../Library/WebSocket/Debug/Exe/WebSocket.a</state>
+          <state>$PROJ_DIR$/../../Library/TLS/Debug/Exe/TLS.a</state>
+          <state>$PROJ_DIR$/../../Library/MQTT/Debug/Exe/MQTT.a</state>
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
@@ -1967,7 +1974,13 @@
     <group>
       <name>shell</name>
       <file>
+        <name>$PROJ_DIR$\shell\sh_cloud.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\shell\sh_debug.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\shell\sh_dns.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\shell\sh_eeprom.c</name>
@@ -1979,7 +1992,13 @@
         <name>$PROJ_DIR$\shell\sh_info.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\shell\sh_mqtt.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\shell\sh_reset.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\shell\sh_test.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\shell\sh_update.c</name>
@@ -2035,7 +2054,37 @@
     <name>$PROJ_DIR$\ell_app.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\ell_app.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ell_app_ctlr.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ell_app_ha_x2.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ell_gateway.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\ell_task.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\ell_task.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\mdns.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\mdns.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\mqtt_task.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\mqtt_task.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\mwa_task.c</name>
   </file>
 </project>
 

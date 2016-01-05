@@ -97,7 +97,9 @@ const SHELL_COMMAND_STRUCT Shell_commands[] = {
 	{ "eeprom",		Shell_eeprom },
 	{ "update",		Shell_update  },
 	{ "version",	Shell_version },
+#if APP_DEBUG
 	{ "info",       Shell_info   },
+#endif
 	{ "help",		help_test    },
 #if (UART_1_DEBUG || RS232C_DEBUG)
 	{ "uspeed",		uartspeed_test },

@@ -11,10 +11,19 @@
     <path>$WS_DIR$\..\..\Library\HaControl\HaControl.ewp</path>
   </project>
   <project>
+    <path>$WS_DIR$\..\..\Library\MQTT\MQTT.ewp</path>
+  </project>
+  <project>
     <path>$WS_DIR$\MQX_Sample_Project.ewp</path>
   </project>
   <project>
     <path>$WS_DIR$\..\..\Platform\Platform.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\..\..\Library\TLS\TLS.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\..\..\Library\WebSocket\WebSocket.ewp</path>
   </project>
   <batchBuild/>
 </workspace>

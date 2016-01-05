@@ -11,6 +11,8 @@
 #include "Tasks.h"
 #include "Config.h"
 
+#include "rand.h"
+
 #include "flash_utils.h"
 
 #include "NetConnect.h"
@@ -23,6 +25,8 @@
 
 #include "ell_task.h"
 #include "led_task.h"
+
+#include "mdns.h"
 
 #include "console_task.h"
 
@@ -109,6 +113,8 @@ void Init_Task(uint32_t data)
 	uint8_t DHCP_mode;
 	static IPCFG_IP_ADDRESS_DATA IP_addr;
 	VERSION_DATA *ver = (VERSION_DATA *)&stSoftwareVersion;
+
+	FSL_InitRandom();
 
 	// ------------------------------------------------------ Start Message ---
 	fflush(stdout);
@@ -211,8 +217,20 @@ void Init_Task(uint32_t data)
 	}
 	msg_printf("[Init] Start DNS Resolver\n");
 
+	// ------------------------------------------ Start mDNS Responder Task ---
+	char hostname[32];
+	sprintf(hostname, "smk_%02x%02x%02x",
+			MAC_addr[3], MAC_addr[4], MAC_addr[5]);
+	error = MDNS_StartTask(hostname, 11);
+	if (error != MQX_OK) {
+		err_printf("[mDNS] failed to start [err=0x%08X]\n", error);
+		_task_block();
+	}
+	msg_printf("[Init] Start mDNS Responder\n");
+	msg_printf("[mDNS] Hostname is \"%s.local\"\n", hostname);
+
 	// -------------------------------------------------- Start Application ---
-#if defined(APP_ENL_ADAPTER)
+#if defined(APP_ENL_ADAPTER) || defined(APP_HAx2_AS_SWITCH_CLASS) || defined(APP_ENL_CONTROLLER)
 	_task_create(0, TN_ELL_TASK, 0);
 #elif defined(APP_MID_ADAPTER)
     _task_create(0, MWA_ADP_TASK, 0);

@@ -21,7 +21,7 @@ PrevWtdReset=ÉJÉXÉ^ÉÄ
 [ArmDriver]
 EnableCache=1
 [DebugChecksum]
-Checksum=-1137369797
+Checksum=-476337505
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -57,7 +57,11 @@ Fmt11=struct GPIO_MemMap-PSOR	4	0
 Fmt12=struct GPIO_MemMap-PTOR	4	0
 [array_types]
 Fmt0=uint32_t[32]	4	0
-Fmt1=uint8_t[6]	4	0
+Fmt1=uint32_t[5]	4	0
+Fmt2=uint8_t[17]	4	0
+Fmt3=uint8_t[32]	4	0
+Fmt4=uint8_t[64]	4	0
+Fmt5=uint8_t[6]	4	0
 [watch_formats]
 Fmt0={W}0:gHaSignalChangeCount	3	0
 Fmt1={W}0:server_ipaddr	4	0

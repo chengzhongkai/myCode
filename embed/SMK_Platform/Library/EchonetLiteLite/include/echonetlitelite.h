@@ -48,7 +48,7 @@ void ELL_InitObjects(void);
 ELL_Object_t *ELL_RegisterObject(uint32_t eoj, const uint8_t *define);
 bool_t ELL_AddRangeRule(ELL_Object_t *obj, const uint8_t *range);
 bool_t ELL_AddCallback(ELL_Object_t *obj,
-                       ELL_SetCallback *set_cb, ELL_GetCallback *get_cb);
+                       ELL_SetCallback_t *set_cb, ELL_GetCallback_t *get_cb);
 ELL_Object_t *ELL_FindObject(uint32_t eoj);
 uint32_t ELL_GetNextInstance(uint32_t eoj);
 bool_t ELL_InitProperty(ELL_Object_t *obj,
@@ -63,6 +63,11 @@ bool_t ELL_CheckProperty(ELL_Object_t *obj,
 void ELL_ClearAnnounce(ELL_Object_t *obj);
 void ELL_NeedAnnounce(ELL_Object_t *obj, uint8_t epc);
 int ELL_GetAnnounceEPC(ELL_Object_t *obj, uint8_t *buf, int max);
+
+uint8_t ELL_GetPropertyVirtual(ELL_Object_t *obj,
+							   uint8_t epc, uint8_t *edt, int max);
+uint8_t ELL_SetPropertyVirtual(ELL_Object_t *obj,
+							   uint8_t epc, uint8_t pdc, const uint8_t *edt);
 
 //=============================================================================
 void ELL_StartUp(void *handle);
@@ -81,6 +86,9 @@ void ELL_SetRecvPropertyCallback(ELL_RecvPropertyCB *recv_prop);
 typedef void ELL_LockCB(void *data);
 typedef void ELL_UnlockCB(void *data);
 bool_t ELL_SetLockFunc(ELL_LockCB *lock, ELL_UnlockCB *unlock, void *data);
+
+typedef void ELL_NotifyAnnoEPCCB(uint32_t eoj, uint8_t *epc_list, int len);
+void ELL_SetNotifyAnnoEPCCallback(ELL_NotifyAnnoEPCCB *callback);
 
 //=============================================================================
 void ELLDbg_PrintPacket(const char *prefix, IPv4Addr_t addr,

@@ -564,7 +564,7 @@ bool_t ELL_AddRangeRule(ELL_Object_t *obj, const uint8_t *range)
 
 //=============================================================================
 bool_t ELL_AddCallback(ELL_Object_t *obj,
-                       ELL_SetCallback *set_cb, ELL_GetCallback *get_cb)
+                       ELL_SetCallback_t *set_cb, ELL_GetCallback_t *get_cb)
 {
     if (obj == NULL) return (FALSE);
 
@@ -986,6 +986,62 @@ int ELL_GetAnnounceEPC(ELL_Object_t *obj, uint8_t *buf, int max)
     buf[num] = 0;
 
     return (num);
+}
+
+//=============================================================================
+uint8_t ELL_GetPropertyVirtual(ELL_Object_t *obj,
+							   uint8_t epc, uint8_t *edt, int max)
+{
+	uint8_t flag;
+	uint8_t pdc;
+
+	if (obj == NULL || edt == NULL || max == 0) return (0);
+
+	flag = ELL_GetPropertyFlag(obj, epc);
+	if ((flag & EPC_FLAG_RULE_GET) == 0) {
+		// --------------------------------------------- No Get Access Rule ---
+		pdc = 0;
+	} else if ((flag & EPC_FLAG_RULE_GETUP) != 0 && obj->get_cb != NULL) {
+		// --------------------------------------- Has Callback for Getting ---
+		pdc = (*(ELL_GetCallback_t *)obj->get_cb)(obj, epc, edt, max);
+	} else {
+		// ------------------------------------------ Get Property Directly ---
+		pdc = ELL_GetProperty(obj, epc, edt, max);
+	}
+
+	return (pdc);
+}
+
+//=============================================================================
+uint8_t ELL_SetPropertyVirtual(ELL_Object_t *obj,
+							   uint8_t epc, uint8_t pdc, const uint8_t *edt)
+{
+	uint8_t flag;
+	bool_t result;
+
+	if (obj == NULL || edt == NULL || pdc == 0) return (0);
+
+	result = FALSE;
+	flag = ELL_GetPropertyFlag(obj, epc);
+	if ((flag & EPC_FLAG_RULE_SET) == 0) {
+		// --------------------------------------------- No Set Access Rule ---
+	}
+	else if (pdc == 0) {
+		// ------------------------------------------------ PDC = 0, no EDT ---
+	}
+	else if ((flag & EPC_FLAG_RULE_SETUP) != 0 && obj->set_cb != NULL) {
+		// --------------------------------------- Has Callback for Setting ---
+		result = (*(ELL_SetCallback_t *)obj->set_cb)(obj, epc, pdc, edt);
+	}
+	else if (!ELL_CheckProperty(obj, epc, pdc, edt)) {
+		// ------------------------------------ Failed to Check Value Range ---
+	}
+	else {
+		// ------------------------------------------ Set Property Directly ---
+		result = ELL_SetProperty(obj, epc, pdc, edt);
+	}
+
+	return (result);
 }
 
 /******************************** END-OF-FILE ********************************/

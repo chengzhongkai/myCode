@@ -8,25 +8,7 @@
 
 #include "Config.h"
 
-#define APP_HAx2_AS_SWITCH_CLASS  1
-#define APP_HAx1_AS_ELECTRIC_LOCK 0
-#define APP_HAx1_AS_OKAYA_SWITCH  0
-
-#if 0 // Aircon for OKAYA
-#define APP_OKAYA_SW_EOJ 0x013001
-#endif
-
-#if 0 // Instantaneous Water Heater for OKAYA
-#define APP_OKAYA_SW_EOJ 0x027201
-#endif
-
-#if 1 // Floor Heater for OKAYA
-#define APP_OKAYA_SW_EOJ 0x027b01
-#endif
-
-#define EOJ_DEF ((APP_OKAYA_SW_EOJ & 0xff0000) >> 16), \
-		((APP_OKAYA_SW_EOJ & 0x00ff00) >> 8), \
-		(APP_OKAYA_SW_EOJ & 0x0000ff) 
+#ifdef APP_HAx2_AS_SWITCH_CLASS
 
 //=============================================================================
 typedef struct {
@@ -50,7 +32,6 @@ static _queue_id gELLAdpReqQID = 0;
 static ELL_AdpReqMsg_t *ELLAdp_AllocMsg(_queue_id source_qid);
 
 //=============================================================================
-#if APP_HAx2_AS_SWITCH_CLASS
 const uint8_t gNodeProfileEPC[] = {
     0x80,  1, 0x30, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO),
     0x82,  4, 0x01, 0x0a, 0x01, 0x00, EPC_FLAG_RULE_GET,
@@ -112,122 +93,12 @@ const uint8_t gSwitch2EPC[] = {
 
     0x00 /*** Terminater ***/
 };
-#endif
 
 //=============================================================================
 const uint8_t gSwitchEPCRange[] = {
     0x80, ELL_PROP_LIST, 0x02, 0x30, 0x31,
     // 0x81, ELL_PROP_NG_LIST, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x81, ELL_PROP_VARIABLE,
-    0x00 /*** Terminator ***/
-};
-
-
-
-//*****************************************************************************
-// for OKAYA KOHKI
-//*****************************************************************************
-
-//=============================================================================
-#if APP_HAx1_AS_OKAYA_SWITCH
-const uint8_t gNodeProfileEPC[] = {
-    0x80,  1, 0x30, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO),
-    0x82,  4, 0x01, 0x0a, 0x01, 0x00, EPC_FLAG_RULE_GET,
-    0x83, 17, 0xfe, 0x00, 0x00, 0x7e,
-              EOJ_DEF, 0x00, 0x00, 0x00, 0x00,
-              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, EPC_FLAG_RULE_GET,
-    0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
-    0xd3,  3, 0x00, 0x00, 0x01, EPC_FLAG_RULE_GET, // N of Instances
-    0xd4,  2, 0x00, 0x02, EPC_FLAG_RULE_GET, // N of Classes (includes Node Prof)
-    0xd5,  4, 0x01, 0x05, 0xfd, 0x01,
-              EPC_FLAG_RULE_ANNO, // Instance List Notification
-    0xd6,  4, 0x01, 0x05, 0xfd, 0x01,
-              EPC_FLAG_RULE_GET, // Node Instance List
-    0xd7,  3, 0x01, 0x05, 0xfd, EPC_FLAG_RULE_GET, // Node Class List
-
-    0x00 /*** Terminater ***/
-};
-#endif
-
-//=============================================================================
-#if APP_HAx1_AS_ELECTRIC_LOCK
-const uint8_t gNodeProfileEPC[] = {
-    0x80,  1, 0x30, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO),
-    0x82,  4, 0x01, 0x0a, 0x01, 0x00, EPC_FLAG_RULE_GET,
-    0x83, 17, 0xfe, 0x00, 0x00, 0x7e,
-              0x0e, 0xf0, 0x01, 0x00, 0x00, 0x00, 0x00,
-              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, EPC_FLAG_RULE_GET,
-    0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
-    0xd3,  3, 0x00, 0x00, 0x01, EPC_FLAG_RULE_GET, // N of Instances
-    0xd4,  2, 0x00, 0x02, EPC_FLAG_RULE_GET, // N of Classes (includes Node Prof)
-    0xd5,  4, 0x01, 0x02, 0x6f, 0x01,
-              EPC_FLAG_RULE_ANNO, // Instance List Notification
-    0xd6,  4, 0x01, 0x02, 0x6f, 0x01,
-              EPC_FLAG_RULE_GET, // Node Instance List
-    0xd7,  3, 0x01, 0x02, 0x6f, EPC_FLAG_RULE_GET, // Node Class List
-
-    0x00 /*** Terminater ***/
-};
-#endif
-
-//=============================================================================
-// HA Switch Class (Aircon Custom)
-//=============================================================================
-const uint8_t gHASwAirconEPC[] = {
-    0x80,  1, 0x31, (EPC_FLAG_RULE_SET | EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO
-					 | EPC_FLAG_RULE_SETUP),
-#if (ELL_USE_FIXED_PDC != 0)
-    0x81,  1, 0x00, (EPC_FLAG_RULE_SET | EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO
-					 | EPC_FLAG_RULE_SETUP | EPC_FLAG_RULE_GETUP,
-#else
-    0x81, 17, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-              EPC_FLAG_RULE_SET | EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO
-              | EPC_FLAG_RULE_SETUP,
-#endif
-    0x82,  4, 0x00, 0x00, 0x44, 0x00, EPC_FLAG_RULE_GET,
-    0x83, 17, 0xfe, 0x00, 0x00, 0x7e,
-              EOJ_DEF, 0x00, 0x00, 0x00, 0x00,
-              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, EPC_FLAG_RULE_GET,
-    0x88,  1, 0x42, EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO,
-    0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
-
-    0x00 /*** Terminater ***/
-};
-
-//=============================================================================
-// Electric Lock Class
-//=============================================================================
-const uint8_t gElectricLockEPC[] = {
-    0x80,  1, 0x30, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO),
-#if (ELL_USE_FIXED_PDC != 0)
-    0x81,  1, 0x00,
-              EPC_FLAG_RULE_SET | EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO
-              | EPC_FLAG_RULE_SETUP | EPC_FLAG_RULE_GETUP,
-#else
-    0x81, 17, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-              EPC_FLAG_RULE_SET | EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO
-              | EPC_FLAG_RULE_SETUP,
-#endif
-    0x82,  4, 0x00, 0x00, 0x44, 0x00, EPC_FLAG_RULE_GET,
-    0x88,  1, 0x42, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_ANNO),
-    0x8a,  3, 0x00, 0x00, 0x7e, EPC_FLAG_RULE_GET,
-
-	0xe0,  1, 0x41, (EPC_FLAG_RULE_GET | EPC_FLAG_RULE_SET
-					 | EPC_FLAG_RULE_ANNO | EPC_FLAG_RULE_SETUP),
-	// 0x41 = Locked
-	// 0x42 = Unlocked
-
-    0x00 /*** Terminater ***/
-};
-
-//=============================================================================
-const uint8_t gElectricLockEPCRange[] = {
-    0x80, ELL_PROP_LIST, 0x02, 0x30, 0x31,
-    // 0x81, ELL_PROP_NG_LIST, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-    0x81, ELL_PROP_VARIABLE,
-	0xe0, ELL_PROP_LIST, 0x02, 0x41, 0x42,
     0x00 /*** Terminator ***/
 };
 
@@ -461,7 +332,6 @@ bool_t ELL_ConstructObjects(void)
 
     ELL_InitObjects();
 
-#if APP_HAx2_AS_SWITCH_CLASS
     // ------------------------------------------ Construct Switch Object 1 ---
     obj = ELL_RegisterObject(0x05fd01, gSwitch1EPC);
     if (obj == NULL) return (FALSE);
@@ -498,55 +368,6 @@ bool_t ELL_ConstructObjects(void)
 	edt[0] = (ha_state == HA_STATE_ON) ? 0x30 : 0x31;
 	ELL_InitProperty(obj, 0x80, 1, edt);
 
-#else
-
-#if APP_HAx1_AS_OKAYA_SWITCH
-    // ----------------------------------- Construct Switch Object (Aircon) ---
-    obj = ELL_RegisterObject(0x05fd01, gHASwAirconEPC);
-    if (obj == NULL) return (FALSE);
-    ELL_AddRangeRule(obj, gSwitchEPCRange);
-
-#if (ELL_USE_FIXED_PDC != 0)
-    ELL_AddCallback(obj, SW_SetProperty, SW_GetProperty);
-    gInstallationLocation[0][0] = 0x00;
-#else
-    ELL_AddCallback(obj, SW_SetProperty, NULL);
-    ELL_InitProperty(obj, 0x81, 1, installation_location);
-#endif
-
-	ELL_GetProperty(obj, 0x83, id_number, 17);
-	ipcfg_get_mac(BSP_DEFAULT_ENET_DEVICE, mac);
-	MEM_Copy(&id_number[11], (uint8_t *)mac, 6);
-	ELL_InitProperty(obj, 0x83, 17, id_number);
-
-	// Init Power State Property (0x80)
-	ha_state = HaControl_GetState(0);
-	edt[0] = (ha_state == HA_STATE_ON) ? 0x30 : 0x31;
-	ELL_InitProperty(obj, 0x80, 1, edt);
-
-#elif APP_HAx1_AS_ELECTRIC_LOCK
-
-    // ------------------------------------- Construct Electric Lock Object ---
-    obj = ELL_RegisterObject(0x026f01, gElectricLockEPC);
-    if (obj == NULL) return (FALSE);
-    ELL_AddRangeRule(obj, gElectricLockEPCRange);
-
-#if (ELL_USE_FIXED_PDC != 0)
-    ELL_AddCallback(obj, SW_SetProperty, SW_GetProperty);
-    gInstallationLocation[0][0] = 0x00;
-#else
-    ELL_AddCallback(obj, SW_SetProperty, NULL);
-    ELL_InitProperty(obj, 0x81, 1, installation_location);
-#endif
-
-	// Init Set Lock State Property (0xE0)
-	ha_state = HaControl_GetState(0);
-	edt[0] = (ha_state == HA_STATE_ON) ? 0x41 : 0x42;
-	ELL_InitProperty(obj, 0xe0, 1, edt);
-
-#endif
-
-#endif
 
     // -------------------------------------- Construct Node Profile Object ---
     obj = ELL_RegisterObject(0x0ef001, gNodeProfileEPC);
@@ -571,18 +392,8 @@ static void SW_InfluteHAState2ELL(HaState_t ha_state, uint32_t eoj)
 
 	obj = ELL_FindObject(eoj);
 	if (obj != NULL) {
-#if APP_HAx2_AS_SWITCH_CLASS
 		edt[0] = (ha_state == HA_STATE_ON) ? 0x30 : 0x31;
 		ELL_SetProperty(obj, 0x80, 1, edt);
-#else
-#if APP_HAx1_AS_OKAYA_SWITCH
-		edt[0] = (ha_state == HA_STATE_ON) ? 0x30 : 0x31;
-		ELL_SetProperty(obj, 0x80, 1, edt);
-#elif APP_HAx1_AS_ELECTRIC_LOCK
-		edt[0] = (ha_state == HA_STATE_ON) ? 0x41 : 0x42;
-		ELL_SetProperty(obj, 0xe0, 1, edt);
-#endif
-#endif
 	}
 }
 
@@ -703,21 +514,13 @@ void ELL_AdpSync_Task(uint32_t param)
 
 	// ---------------------------------------------------------- Main Loop ---
 	while (1) {
-#if APP_HAx2_AS_SWITCH_CLASS
 		_time_delay(500);
 		SW_CheckHAState(0, 0x05fd01);
 		_time_delay(500);
 		SW_CheckHAState(1, 0x05fd02);
-#else
-#if APP_HAx1_AS_OKAYA_SWITCH
-		_time_delay(500);
-		SW_CheckHAState(0, 0x05fd01);
-#elif APP_HAx1_AS_ELECTRIC_LOCK
-		_time_delay(500);
-		SW_CheckHAState(0, 0x026f01);
-#endif
-#endif
 	}
 }
+
+#endif /* APP_HAx2_AS_SWITCH_CLASS */
 
 /******************************** END-OF-FILE ********************************/

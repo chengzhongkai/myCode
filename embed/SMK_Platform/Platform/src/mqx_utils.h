@@ -22,6 +22,8 @@ uint32_t MQX_CreateTask(_task_id *task_id,
 						TASK_FPTR func, _mem_size stack_size,
 						uint32_t priority, const char *name, uint32_t param);
 
+void MQX_SWReset(void);
+
 #endif /* !_MQX_UTILS_H */
 
 /******************************** END-OF-FILE ********************************/

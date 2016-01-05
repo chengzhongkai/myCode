@@ -7,6 +7,40 @@
 #include "Config.h"
 #include "Tasks.h"
 
+#if defined(APP_ENL_ADAPTER) || defined(APP_HAx2_AS_SWITCH_CLASS) || defined(APP_ENL_CONTROLLER)
+
+#if defined(APP_ENL_CONTROLLER)
+//=============================================================================
+static void ELL_RecvProperty(const ELL_Header_t *header, const void *src,
+							 const ELL_Property_t *prop)
+{
+	if (header == NULL || prop == NULL) return;
+
+	printf("TID:0x%04x, SEOJ:0x%06x, DEOJ:0x%06x, ESV:0x%02x\n",
+		   header->tid, header->seoj, header->deoj, header->esv);
+
+	if (src == NULL) {
+		printf("from Multicast\n");
+	} else {
+		IPv4Addr_t addr = *((IPv4Addr_t *)src);
+		printf("from %d.%d.%d.%d\n",
+			   (addr >> 24) & 0xff, (addr >> 16) & 0xff,
+			   (addr >> 8) & 0xff, addr & 0xff);
+	}
+
+	printf("EPC:0x%02x, PDC:%d\n", prop->epc, prop->pdc);
+	if (prop->pdc == 0 || prop->edt == NULL) {
+		printf("EDT:null\n");
+	} else {
+		printf("EDT:");
+		for (int cnt = 0; cnt < prop->pdc; cnt ++) {
+			printf("0x%02x, ", prop->edt[cnt]);
+		}
+		printf("\n");
+	}
+}
+#endif
+
 //=============================================================================
 static uint8_t gRecvBuffer[ELL_RECV_BUF_SIZE];
 static UDP_Handle_t gUDP;
@@ -46,6 +80,12 @@ bool_t ELL_SendPacket(void *handle, void *dest, const uint8_t *buf, int len)
     _lwsem_post(&gUDPSendSem);
 
     return (ret);
+}
+
+//=============================================================================
+bool_t ELL_SendPacketEx(void *dest, const uint8_t *buf, int len)
+{
+	return (ELL_SendPacket(&gUDP, dest, buf, len));
 }
 
 //=============================================================================
@@ -120,6 +160,10 @@ void ELL_Task(uint32_t param)
     }
     ELL_SetSendPacketCallback(ELL_SendPacket);
 
+#if 0 // for TEST
+	ELL_SetRecvPropertyCallback(ELL_RecvProperty);
+#endif
+
     ELL_SetLockFunc(ELL_Lock, ELL_Unlock, &gELLRscSem);
 
     // _time_delay(1000);
@@ -139,6 +183,10 @@ void ELL_Task(uint32_t param)
     msg_printf("\n[ELL RCV] START\n");
 
 	gELLTaskStart = TRUE;
+
+#if defined(APP_ENL_CONTROLLER)
+	_task_create(0, TN_ELL_GATEWAY_APP_TASK, 0);
+#endif
 
     // ---------------------------------------------------------- Main Loop ---
     while (1) {
@@ -235,5 +283,7 @@ void ELL_INF_Task(uint32_t param)
         ELL_CheckAnnounce(&gUDP);
     }
 }
+
+#endif /* APP_ENL_ADAPTER */
 
 /******************************** END-OF-FILE ********************************/

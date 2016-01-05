@@ -8,6 +8,8 @@
 
 #include "Config.h"
 
+#ifdef APP_ENL_ADAPTER
+
 #if !defined(APP_OKAYA_HAx1_AIRCON) \
 	&& !defined(APP_OKAYA_HAx1_WATER_HEATER) \
 	&& !defined(APP_OKAYA_HAx1_FLOOR_HEATER) \
@@ -584,5 +586,7 @@ void ELL_AdpSync_Task(uint32_t param)
 #endif
 	}
 }
+
+#endif /* APP_ENL_ADAPTER */
 
 /******************************** END-OF-FILE ********************************/

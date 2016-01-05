@@ -18,6 +18,14 @@ extern int32_t Shell_info(int32_t argc, char *argv[]);
 extern int32_t Shell_reset(int32_t argc, char *argv[]);
 
 extern int32_t Shell_debug(int32_t argc, char *argv[]);
+extern int32_t Shell_test(int32_t argc, char *argv[]);
+
+extern int32_t Shell_dns(int32_t argc, char *argv[]);
+
+extern int32_t Shell_cloud(int32_t argc, char *argv[]);
+extern int32_t Shell_echonet(int32_t argc, char *argv[]);
+
+extern int32_t Shell_mqtt(int32_t argc, char *argv[]);
 
 #endif /* !_SHELL_COMMAND_H */
 

@@ -136,15 +136,15 @@ typedef struct {
     uint32_t eoj;
     uint8_t num_epc;
     ELL_EPCDefine_t *epc_list;
-    void *set_cb; // ELL_SetCallback
-    void *get_cb; // ELL_GetCallback
+    void *set_cb; // ELL_SetCallback_t
+    void *get_cb; // ELL_GetCallback_t
 } ELL_Object_t;
 
 //=============================================================================
-typedef bool_t ELL_SetCallback(ELL_Object_t *obj,
-                               uint8_t epc, uint8_t pdc, const uint8_t *edt);
-typedef uint8_t ELL_GetCallback(ELL_Object_t *obj,
-                                uint8_t epc, uint8_t *edt, int max);
+typedef bool_t ELL_SetCallback_t(ELL_Object_t *obj,
+								 uint8_t epc, uint8_t pdc, const uint8_t *edt);
+typedef uint8_t ELL_GetCallback_t(ELL_Object_t *obj,
+								  uint8_t epc, uint8_t *edt, int max);
 
 //=============================================================================
 typedef struct {

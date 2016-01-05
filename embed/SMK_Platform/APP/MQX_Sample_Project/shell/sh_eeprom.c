@@ -10,7 +10,7 @@
 #include "flash_utils.h"
 
 //=============================================================================
-static const char sEepromCmdHelp[]  = "eeprom [mac|code|serial|ftpid|ftpsubd|ftppath|dhcp|ip|netmask|gateway] (<data>)\\n\n";
+static const char sEepromCmdHelp[]  = "eeprom [mac|code|serial|ftpid|ftpsubd|ftppath|dhcp|ip|netmask|gateway|sgwhost|sgwport|sgwpath] (<data>)\\n\n";
 
 static const char *sReadError = "Read error\n";
 static const char *sDataError = "Data error\n";
@@ -51,6 +51,17 @@ static void write_eeprom_ip(uint32_t id, const char *str, uint32_t size)
 	}
 
 	write_eeprom(id, (uint8_t *)&temp.s_addr, size);
+}
+
+//=============================================================================
+static void write_eeprom_portno(uint32_t id, uint16_t portno)
+{
+	uint8_t buf[2];
+
+	buf[0] = (portno >> 8) & 0xff;
+	buf[1] = portno & 0xff;
+
+	write_eeprom(id, buf, 2);
 }
 
 //=============================================================================
@@ -97,6 +108,19 @@ static void read_eeprom_ip(const char *prefix, uint32_t id, uint32_t size)
 		puts(prefix);
 		puts(ip_str);
 		putchar('\n');
+	}
+}
+
+//=============================================================================
+static void read_eeprom_portno(const char *prefix, uint32_t id)
+{
+	uint8_t buf[2];
+	uint16_t portno;
+
+	if (read_eeprom(id, buf, 2)) {
+		puts(prefix);
+		portno = ((uint16_t)buf[0] << 8) + (uint16_t)buf[1];
+		printf("%d\n", portno);
 	}
 }
 
@@ -288,6 +312,39 @@ int32_t Shell_eeprom(int32_t argc, char *argv[])
 							(const char *)argv[2], FLASHROM_GATEWAY_SIZE);
 		}
 	}
+	// ------------------------------------------------- SGW WebSocket Host ---
+	else if (strcmp(type_str, "sgwhost") == 0) {
+		uint8_t buf[FLASHROM_SGWS_HOST_SIZE + 1];
+		if (argc == 2) {
+			read_eeprom_str("SGW Host : ", FLASHROM_SGWS_HOST_ID,
+							buf, FLASHROM_SGWS_HOST_SIZE);
+		} else {
+			write_eeprom_str(FLASHROM_SGWS_HOST_ID,
+							 argv[2], buf, FLASHROM_SGWS_HOST_SIZE);
+		}
+	}
+	// ------------------------------------------------- SGW WebSocket Path ---
+	else if (strcmp(type_str, "sgwport") == 0) {
+		if (argc == 2) {
+			read_eeprom_portno("SGW PortNo : ", FLASHROM_SGWS_PORTNO_ID);
+		} else {
+			uint16_t portno;
+			portno = atoi(argv[2]);
+			write_eeprom_portno(FLASHROM_SGWS_PORTNO_ID, portno);
+		}
+	}
+	// ------------------------------------------------- SGW WebSocket Path ---
+	else if (strcmp(type_str, "sgwpath") == 0) {
+		uint8_t buf[FLASHROM_SGWS_PATH_SIZE + 1];
+		if (argc == 2) {
+			read_eeprom_str("SGW Path : ", FLASHROM_SGWS_PATH_ID,
+							buf, FLASHROM_SGWS_PATH_SIZE);
+		} else {
+			write_eeprom_str(FLASHROM_SGWS_PATH_ID,
+							 argv[2], buf, FLASHROM_SGWS_PATH_SIZE);
+		}
+	}
+
 	else {
 		printf("Usage: %s", sEepromCmdHelp);
 		return (0);
