@@ -51,6 +51,11 @@ end
 --------------------------------------
 function connWifi(ssid,pwd,callback,timeout)
   wifi.setmode(wifi.STATION)
+  
+  
+  --wifi.sta.setip(cfg)
+  
+  
   wifi.sta.config(ssid, pwd)
   local i=0
   tmr.alarm (1, 800, 1, function ( )
@@ -125,17 +130,17 @@ if oldTemp - tmp ~= 0 then
       msgStr = "temp001:"..tmp..":"..bb
       addLog(msgStr)
       sendMsg(msgStr,function()
-        node.dsleep(60000000)
+        node.dsleep(60000000,4)
       end)
       
     end) 
   end,function()
     print("timeout ...")
-    node.dsleep(60000000)
+    node.dsleep(60000000,4)
   end)
 else
   -- continue next sampling
-  node.dsleep(60000000)
+  node.dsleep(60000000,4)
 end
 
 
